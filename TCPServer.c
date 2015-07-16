@@ -1,5 +1,6 @@
 /*
- * server.c
+ * TCPServer.c
+Sources: http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
  */
 
 #include <stdio.h>
@@ -15,15 +16,21 @@
 #include <sys/wait.h>
 #include <signal.h>
 
-#define PORT "30020"  // the port users will be connecting to
-
 #define BACKLOG 10     // how many pending connections queue will hold
 
 void signalHandler(int s){
   while(waitpid(-1, NULL, WNOHANG) > 0);
 }
 
-int main(void){
+int main(int argc, char* argv[]){
+		char *portNumber;
+		if(argc<2){
+			fprintf(stderr,"\n***ERROR: Missing port number in command-line argument: e.g. ./TCPserver port\n\n");
+			exit(0);
+		}
+		else{
+			portNumber = argv[1];
+		}
     int status, welcomeSocket, connectionSocket, yes=1;  // listen on sock_fd, new connection on connectionSocket
     struct addrinfo hints, *serverInfo, *p;
     struct sockaddr_storage clientAddr; // connector's address information
@@ -35,7 +42,7 @@ int main(void){
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE; // use my IP
 
-    if ((status = getaddrinfo(NULL, PORT, &hints, &serverInfo)) != 0) {
+    if ((status = getaddrinfo(NULL, portNumber, &hints, &serverInfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
         return 1;
     }
@@ -76,7 +83,7 @@ int main(void){
     }
     
     printf("\nSimple Chat System (by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
-    printf("\nServer: Waiting for client connections on port %s...\n",PORT);
+    printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
     
     while(1) {  // main accept() loop
         sin_size = sizeof clientAddr;
@@ -85,10 +92,10 @@ int main(void){
             perror("accept");
             continue;
         }
-
+				
         if (!fork()) { // this is the child process
             close(welcomeSocket); // child doesn't need the listener
-            if (send(connectionSocket, "Watson residence!", 13, 0) == -1)
+            if (send(connectionSocket, "Watson residence!", 17, 0) == -1)
                 perror("send");
             close(connectionSocket);
             exit(0);
