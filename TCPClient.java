@@ -41,7 +41,7 @@ class TCPClient {
 				System.out.print(handle);	
 				message = inFromUser.readLine();   
 				if(!message.equals("\\quit")){
-					outToServer.writeBytes(message + '\n');   
+					outToServer.writeBytes(handle + message + '\n');   
 					response = inFromServer.readLine();   
 					System.out.println("FROM SERVER: " + response);   
 				}

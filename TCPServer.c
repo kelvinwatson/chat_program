@@ -17,6 +17,7 @@ Sources: http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
 #include <signal.h>
 
 #define BACKLOG 10     // how many pending connections queue will hold
+#define MESSAGE_SIZE 500
 
 void signalHandler(int s){
   while(waitpid(-1, NULL, WNOHANG) > 0);
@@ -100,6 +101,9 @@ int main(int argc, char* argv[]){
 		
 		printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
     
+		char message[MESSAGE_SIZE];
+		memset(message,0,MESSAGE_SIZE);
+		int charsRecv,sendStatus;
     while(1) {  // main accept() loop
         sin_size = sizeof clientAddr;
         /*open a connection socket*/
@@ -112,10 +116,28 @@ int main(int argc, char* argv[]){
 
         if (!fork()) {
             close(welcomeSocket);
-						
-            if (send(connectionSocket, "Watson residence!", 17, 0) == -1)
-                perror("send");
-            close(connectionSocket);
+						while(1){
+
+							if((charsRecv=recv(connectionSocket,message,MESSAGE_SIZE,0))==-1){
+							 		//error receiving
+									perror("receive");
+							}
+							else if(charsRecv==0){
+							 		//client closed the connection	
+									break;
+							}
+							else{ //receive success
+								message[charsRecv]= '\0'; //append null terminator to message
+								printf("%s",message);
+								//now prompt for user input here and send it out!
+
+							}
+
+							if((sendStatus=send(connectionSocket, "Watson residence!", 17, 0))==-1) {
+								perror("send");
+							}
+						}
+						close(connectionSocket);
             exit(0);
         }
         close(connectionSocket);  // parent doesn't need this
