@@ -82,19 +82,37 @@ int main(int argc, char* argv[]){
         exit(1);
     }
     
-    printf("\nSimple Chat System (by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
-    printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
+    printf("\n\nSimple Chat System (SERVER SIDE)");
+		printf("\nProgrammed by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
+    printf("\n**************************************************************");
+		
+		//getUserInput();
+		printf("\nEnter a username (max 10 characters): ");
+		char user[11];		//extra space for null terminator
+		scanf("%10s",user);
+		printf("Welcome %s!\n",user);
+		size_t len = strlen(user);
+		char* handle = malloc(len+3); 	//extra space for null terminator
+		strcpy(handle,user);
+		handle[len] = '>';
+		handle[len+1] = 32;
+		handle[len+2] = '\0';
+		
+		printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
     
     while(1) {  // main accept() loop
         sin_size = sizeof clientAddr;
-        connectionSocket = accept(welcomeSocket, (struct sockaddr *)&clientAddr, &sin_size);
+        /*open a connection socket*/
+				connectionSocket = accept(welcomeSocket, (struct sockaddr *)&clientAddr, &sin_size);
         if (connectionSocket == -1) {
             perror("accept");
             continue;
         }
 				
-        if (!fork()) { // this is the child process
-            close(welcomeSocket); // child doesn't need the listener
+
+        if (!fork()) {
+            close(welcomeSocket);
+						
             if (send(connectionSocket, "Watson residence!", 17, 0) == -1)
                 perror("send");
             close(connectionSocket);

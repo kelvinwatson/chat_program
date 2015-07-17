@@ -19,14 +19,15 @@ class TCPClient {
 		Socket clientSocket = null;
 
 		try{
-			inFromUser = new BufferedReader(new InputStreamReader(System.in));   
 			clientSocket = new Socket(hostName, 30020);   
+			inFromUser = new BufferedReader(new InputStreamReader(System.in));   
 			outToServer = new DataOutputStream(clientSocket.getOutputStream());   
 			inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   
-
 						
-			System.out.println("\n\nConnection successful. Welcome to Simple Chat.");
-			System.out.println("**********************************************");
+			System.out.println("\n\nSimple Chat System (CLIENT)");
+			System.out.println("Programmed by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
+			System.out.println("**************************************************************");
+			System.out.println("TCP Connection established. Welcome to Simple Chat.");
 			System.out.print("Enter a user name (max 10 characters): ");
 			Scanner input = new Scanner(System.in);
 			user = input.next();
@@ -45,16 +46,14 @@ class TCPClient {
 					System.out.println("FROM SERVER: " + response);   
 				}
 				else{
-					System.out.println("Chat terminated. ");
+					System.out.print("\nChat terminated. ");
 					break;
 				}
 			}while(message != "\\quit");
 
 		} finally {
-			if(inFromServer!= null) inFromServer.close();
-			if(outToServer!= null) outToServer.close();
 			clientSocket.close();
-			System.out.print("Connection terminated");
+			System.out.print("TCP connection closed.\nThank you for using Simple Chat.\n\n");
 		}
 	} 
 }
