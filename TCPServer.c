@@ -90,7 +90,7 @@ int main(int argc, char* argv[]){
 		//getUserInput();
 		printf("\nEnter a username (max 10 characters): ");
 		char user[11];		//extra space for null terminator
-		scanf("%10s",user);
+		scanf("%s",user);
 		printf("Welcome %s!\n",user);
 		size_t len = strlen(user);
 		char* handle = malloc(len+3); 	//extra space for null terminator
@@ -98,11 +98,12 @@ int main(int argc, char* argv[]){
 		handle[len] = '>';
 		handle[len+1] = 32;
 		handle[len+2] = '\0';
-		
+		size_t handleLen = strlen(handle);
+		printf("\nYour handle is %s",handle);
 		printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
     
-		char message[MESSAGE_SIZE];
-		memset(message,0,MESSAGE_SIZE);
+		char response[MESSAGE_SIZE], input[MESSAGE_SIZE];
+		memset(response,0,MESSAGE_SIZE);
 		int charsRecv,sendStatus;
     while(1) {  // main accept() loop
         sin_size = sizeof clientAddr;
@@ -118,7 +119,7 @@ int main(int argc, char* argv[]){
             close(welcomeSocket);
 						while(1){
 
-							if((charsRecv=recv(connectionSocket,message,MESSAGE_SIZE,0))==-1){
+							if((charsRecv=recv(connectionSocket,response,MESSAGE_SIZE,0))==-1){
 							 		//error receiving
 									perror("receive");
 							}
@@ -127,15 +128,29 @@ int main(int argc, char* argv[]){
 									break;
 							}
 							else{ //receive success
-								message[charsRecv]= '\0'; //append null terminator to message
-								printf("%s",message);
-								//now prompt for user input here and send it out!
-
+								response[charsRecv]= '\0'; //append null terminator to message
+								printf("%s",response);
 							}
-
-							if((sendStatus=send(connectionSocket, "Watson residence!", 17, 0))==-1) {
+							
+							printf("%s",handle);
+                            printf("send success on this side!123222");
+                            //Clear the buffer
+                            scanf("%*[^\n]%1*[\n]");
+							scanf("%s",input);
+							printf("send success on this side!12333");
+                            int inputLen = strlen(input);
+							int messageLen = (int)(handleLen+inputLen);
+							char* message = (char*)malloc(messageLen);
+							strcpy(message,handle);
+							strcat(message,input);
+                            printf("send success on this side!123");
+							if((sendStatus=send(connectionSocket,message,messageLen,0))<=-1) {
 								perror("send");
 							}
+							else{
+								printf("send success on this side!");
+							}
+                            printf("send success on this side!123");
 						}
 						close(connectionSocket);
             exit(0);

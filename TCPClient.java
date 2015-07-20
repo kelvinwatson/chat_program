@@ -19,7 +19,7 @@ class TCPClient {
 		Socket clientSocket = null;
 
 		try{
-			clientSocket = new Socket(hostName, 30020);   
+			clientSocket = new Socket(hostName, portNumber);   
 			inFromUser = new BufferedReader(new InputStreamReader(System.in));   
 			outToServer = new DataOutputStream(clientSocket.getOutputStream());   
 			inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   
@@ -42,14 +42,15 @@ class TCPClient {
 				message = inFromUser.readLine();   
 				if(!message.equals("\\quit")){
 					outToServer.writeBytes(handle + message + '\n');   
-					response = inFromServer.readLine();   
-					System.out.println("FROM SERVER: " + response);   
+					response = inFromServer.readLine();
+					System.out.println("here222");   
+					System.out.println(response);   
 				}
 				else{
 					System.out.print("\nChat terminated. ");
 					break;
 				}
-			}while(message != "\\quit");
+			}while(true);
 
 		} finally {
 			clientSocket.close();
