@@ -43,7 +43,7 @@ class TCPClient {
 				if(!message.equals("\\quit")){
 					outToServer.writeBytes(handle + message + '\n');   
 					response = inFromServer.readLine();
-					System.out.println(response);   
+					System.out.println("response is " + response + '\n');   
 				}
 				else{
 					System.out.print("\nChat terminated. ");
