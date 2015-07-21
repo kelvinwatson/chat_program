@@ -43,7 +43,6 @@ class TCPClient {
 				if(!message.equals("\\quit")){
 					outToServer.writeBytes(handle + message + '\n');   
 					response = inFromServer.readLine();
-					System.out.println("here222");   
 					System.out.println(response);   
 				}
 				else{

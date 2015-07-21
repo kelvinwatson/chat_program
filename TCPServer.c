@@ -17,6 +17,7 @@ Sources: http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
 #include <signal.h>
 
 #define BACKLOG 10     // how many pending connections queue will hold
+#define HANDLE_SIZE 11
 #define MESSAGE_SIZE 500
 
 void signalHandler(int s){
@@ -89,10 +90,23 @@ int main(int argc, char* argv[]){
 		
 		//getUserInput();
 		printf("\nEnter a username (max 10 characters): ");
-		char user[11];		//extra space for null terminator
-		scanf("%s",user);
+		fflush(stdout);
+        char user[11];		//extra space for null terminator
+		fgets(user,HANDLE_SIZE-1,stdin);
+        //need to remove new line from the user!
+        int length = (int)strlen(user);
+        //printf("length of user %d\n",length);
+        //printf("second last char in ASCII num is originally %d\n",user[length-1]);
+        //printf("last char in ASCII num is originally %d\n",user[length]);           
+        user[(int)((int)strlen(user)-1)] = '\0';
+        length = (int)strlen(user);
+        //printf("length of user after null terminator appended %d\n",length);
+        //printf("last char in ASCII num after null terminator appended %d\n",  user[length-1]);
+                                
+        //fflush(stdout);
 		printf("Welcome %s!\n",user);
-		size_t len = strlen(user);
+		fflush(stdout);
+        size_t len = strlen(user);
 		char* handle = malloc(len+3); 	//extra space for null terminator
 		strcpy(handle,user);
 		handle[len] = '>';
@@ -100,9 +114,11 @@ int main(int argc, char* argv[]){
 		handle[len+2] = '\0';
 		size_t handleLen = strlen(handle);
 		printf("\nYour handle is %s",handle);
-		printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
-    
-		char response[MESSAGE_SIZE], input[MESSAGE_SIZE];
+		fflush(stdout);
+        printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
+        fflush(stdout);
+		
+        char response[MESSAGE_SIZE], input[MESSAGE_SIZE];
 		memset(response,0,MESSAGE_SIZE);
 		int charsRecv,sendStatus;
     while(1) {  // main accept() loop
@@ -113,8 +129,6 @@ int main(int argc, char* argv[]){
             perror("accept");
             continue;
         }
-				
-
         if (!fork()) {
             close(welcomeSocket);
 						while(1){
@@ -128,27 +142,40 @@ int main(int argc, char* argv[]){
 									break;
 							}
 							else{ //receive success
-								response[charsRecv]= '\0'; //append null terminator to message
-								printf("%s",response);
+								
+                                printf("numChars received = %d\n",charsRecv);
+                                printf("last char in ASCII num is %d\n",response[charsRecv-1]);
+                                response[charsRecv]= '\0'; //append null terminator to message, which means thre is newline then null
+                                printf("last char in ASCII num is now %d\n",response[charsRecv]);
+                                printf("%s",response);
+                                fflush(stdout); // Prints to screen or whatever your standard out is
 							}
 							
 							printf("%s",handle);
-                            printf("send success on this side!123222");
                             //Clear the buffer
-                            scanf("%*[^\n]%1*[\n]");
-							scanf("%s",input);
-							printf("send success on this side!12333");
-                            int inputLen = strlen(input);
-							int messageLen = (int)(handleLen+inputLen);
+                            fflush(stdout); // Prints to screen or whatever your standard out is
+                                
+                            //NOTE scanf stops reading at space! Must use fgets
+                            //memset(input,0,MESSAGE_SIZE);
+                            //fflush(stdin);
+                            fgets(input, MESSAGE_SIZE-1, stdin); //truncates string to the input length, PLACES NULL TERMINATOR FOR YOU
+							//printf("you just typed %s\n",input);
+                            //fflush(stdout);
+                            
+                            int inputLen = (int)strlen(input);
+							printf("length of input is %d and",inputLen);
+                            fflush(stdout);
+                            printf("last char is %d\n",input[inputLen]);
+                            fflush(stdout);
+                            int messageLen = (int)(handleLen+inputLen);
 							char* message = (char*)malloc(messageLen);
 							strcpy(message,handle);
 							strcat(message,input);
-                            printf("send success on this side!123");
 							if((sendStatus=send(connectionSocket,message,messageLen,0))<=-1) {
 								perror("send");
 							}
 							else{
-								printf("send success on this side!");
+								printf("sending message:  \"%s\"!");
 							}
                             printf("send success on this side!123");
 						}
