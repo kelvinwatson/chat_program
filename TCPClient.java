@@ -1,3 +1,11 @@
+/* Programmed by: Kelvin Watson
+ * OSU ID: 932540242
+ * ONID: watsokel
+ * FileName: chatclient.java
+ * Description: Chat client for 2-way communication with server program
+ * Sources: http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
+ */
+
 //source: https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
 //http://docs.oracle.com/javase/tutorial/networking/sockets/readingWriting.html
 import java.io.*; 
@@ -8,8 +16,7 @@ class TCPClient {
 	public static void main(String argv[]) throws Exception  {   
 		String hostName = argv[0];
 		int portNumber = Integer.parseInt(argv[1]);
-
-		String user, handle, command, message, response;   
+		String user, handle, command, message, response, handleMsg, lengthStr="";   
 		/*Code to get username up to 10chars*/
 		
 		BufferedReader inFromUser = null;
@@ -31,19 +38,23 @@ class TCPClient {
 			System.out.print("Enter a user name (max 10 characters): ");
 			Scanner input = new Scanner(System.in);
 			user = input.next();
-			//HOW TO LIMIT TO 10 CHARS?
+			if(user.length() > 10){
+				user = user.substring(0,10);
+			}
 			handle = user + "> ";
 			System.out.println("Welcome " + user + "! You may now begin chatting.\n");
 			/*send it out with the message*/
-
+			char endTransmission = 3;
 			/*Chat until command to quit*/
 			do{
 				System.out.print(handle);	
 				message = inFromUser.readLine();   
 				if(!message.equals("\\quit")){
-					outToServer.writeBytes(handle + message + '\n');   
+					handleMsg = handle + message;
+					int lengthInt = handleMsg.length();
+					outToServer.writeBytes(handleMsg); 
 					response = inFromServer.readLine();
-					System.out.println("response is " + response + '\n');   
+					System.out.println(response);   
 				}
 				else{
 					System.out.print("\nChat terminated. ");

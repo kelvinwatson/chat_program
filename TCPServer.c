@@ -1,8 +1,13 @@
-/*
- * TCPServer.c
-Sources: http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
+/* Programmed by: Kelvin Watson
+ * OSU ID: 932540242
+ * ONID: watsokel
+ * FileName: chatserve.c
+ * Description: CS372 Assignment 1: Chat server for 2-way communication with client
+ * Sources: http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
+ * http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
  */
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -15,24 +20,24 @@ Sources: http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <time.h>
 
 #define BACKLOG 10     // how many pending connections queue will hold
 #define HANDLE_SIZE 11
 #define MESSAGE_SIZE 500
+#define CLEARBUFFER() char ch; while ((ch = getchar()) != '\n' && ch != EOF);
 
-void signalHandler(int s){
-  while(waitpid(-1, NULL, WNOHANG) > 0);
-}
+void signalHandler(int);
+int sendAll(int,char*,int*);
 
 int main(int argc, char* argv[]){
-		char *portNumber;
-		if(argc<2){
-			fprintf(stderr,"\n***ERROR: Missing port number in command-line argument: e.g. ./TCPserver port\n\n");
-			exit(0);
-		}
-		else{
-			portNumber = argv[1];
-		}
+	char *portNumber;
+	if(argc<2){
+		fprintf(stderr,"\n***ERROR: Missing port number in command-line argument: e.g. ./TCPserver port\n\n");
+		exit(0);
+	}
+	else portNumber = argv[1];
+
     int status, welcomeSocket, connectionSocket, yes=1;  // listen on sock_fd, new connection on connectionSocket
     struct addrinfo hints, *serverInfo, *p;
     struct sockaddr_storage clientAddr; // connector's address information
@@ -85,24 +90,26 @@ int main(int argc, char* argv[]){
     }
     
     printf("\n\nSimple Chat System (SERVER SIDE)");
-		printf("\nProgrammed by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
+	printf("\nProgrammed by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
     printf("\n**************************************************************");
 		
 		//getUserInput();
 		printf("\nEnter a username (max 10 characters): ");
 		fflush(stdout);
-        char user[11];		//extra space for null terminator
-		fgets(user,HANDLE_SIZE-1,stdin);
-        //need to remove new line from the user!
-        int length = (int)strlen(user);
-        //printf("length of user %d\n",length);
-        //printf("second last char in ASCII num is originally %d\n",user[length-1]);
-        //printf("last char in ASCII num is originally %d\n",user[length]);           
-        user[(int)((int)strlen(user)-1)] = '\0';
-        length = (int)strlen(user);
-        //printf("length of user after null terminator appended %d\n",length);
-        //printf("last char in ASCII num after null terminator appended %d\n",  user[length-1]);
-                                
+        char user[HANDLE_SIZE];		//extra space for null terminator
+		fgets(user,HANDLE_SIZE,stdin);        //reads in newline and null terminator
+        CLEARBUFFER()
+        int length = (int)strlen(user);           //includes new line
+        //check for presence of newline
+        int scroll=0;
+        while(scroll!=10){
+            if(user[scroll]=='\n'){
+                user[length-1] = '\0';
+                break;
+            }
+            scroll++;
+        }
+        
         //fflush(stdout);
 		printf("Welcome %s!\n",user);
 		fflush(stdout);
@@ -118,66 +125,77 @@ int main(int argc, char* argv[]){
         printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
         fflush(stdout);
 		
-        char response[MESSAGE_SIZE], input[MESSAGE_SIZE];
+        char response[MESSAGE_SIZE], input[MESSAGE_SIZE], chunk[MESSAGE_SIZE];
 		memset(response,0,MESSAGE_SIZE);
-		int charsRecv,sendStatus;
+		int charsRecv, partialCharsRecv, totalCharsRecv,sendStatus;
         while(1) {  // main accept() loop
             sin_size = sizeof clientAddr;
         /*open a connection socket*/
 			connectionSocket = accept(welcomeSocket, (struct sockaddr *)&clientAddr, &sin_size);
+            fcntl(connectionSocket, F_SETFL, O_NONBLOCK);
             if (connectionSocket == -1) {
                 perror("accept");
                 continue;
             }
+            int transferStarted = 0;
+            int counter = 0;
+            clock_t startTime;
             if (!fork()) {
                 close(welcomeSocket);
-    				while(1){
-    					if((charsRecv=recv(connectionSocket,response,MESSAGE_SIZE,0))==-1){
-    					 		//error receiving
-    							perror("receive");
-    					}
-    					else if(charsRecv==0){
-    					 		//client closed the connection	
-    							break;
-    					}
-    					else{ //receive success	
-                            //printf("numChars received = %d\n",charsRecv);
-                            //printf("last char in ASCII num is %d\n",response[charsRecv-1]);
-                            response[charsRecv]= '\0'; //append null terminator to message, which means thre is newline then null
-                            //printf("last char in ASCII num is now %d\n",response[charsRecv]);
-                            printf("%s",response);
-                            fflush(stdout); // Prints to screen or whatever your standard out is
-    					}
-    					
-    					printf("%s",handle);
-                        //Clear the buffer
+    				while(1){ 
+                        memset(response,0,MESSAGE_SIZE);
+                        do{
+                            memset(chunk,0,MESSAGE_SIZE);
+                            charsRecv=recv(connectionSocket,chunk,MESSAGE_SIZE,0);
+                            if(charsRecv==0){
+                                //client closed the connection 
+                                printf("in charsRecv=0");fflush(stdout); 
+                                break;
+                            }
+                            else if(charsRecv > 0){ //receive success 
+                                if(transferStarted == 0) {
+                                    startTime = clock();
+                                    transferStarted = 1;
+                                }
+                                strcat(response,chunk);
+                                //printf("last char in ASCII num is %d\n",response[charsRecv-1]);
+                                 //append null terminator to message, which means thre is newline then null
+                                //printf("last char in ASCII num is now %d\n",response[charsRecv]);
+                            }
+                            else if(charsRecv < 0 && transferStarted == 1) {
+                                if((clock() - startTime) > 1000) {
+                                    transferStarted = 0;
+                                    break;    
+                                }
+                            }
+                        }while(1);
+
+                        response[charsRecv]= '\0';
+                        printf("%s",response);
                         fflush(stdout); // Prints to screen or whatever your standard out is
+                        //printf("\n");
+
+                        printf("\n%s",handle);
+                        fflush(stdout);
                             
-                        //NOTE scanf stops reading at space! Must use fgets
-                        //memset(input,0,MESSAGE_SIZE);
-                        //fflush(stdin);
-                        fgets(input, MESSAGE_SIZE-1, stdin); //truncates string to the input length, PLACES NULL TERMINATOR FOR YOU
-    					//printf("you just typed %s\n",input);
-                        //fflush(stdout);
+                        char* fGetsStatus = fgets(input, MESSAGE_SIZE, stdin); //truncates string to the input length, PLACES NULL TERMINATOR FOR YOU
                         
                         int inputLen = (int)strlen(input);
-    					printf("length of input is %d and",inputLen);
-                        fflush(stdout);
-                        printf("last char is %d\n",input[inputLen]);
-                        fflush(stdout);
                         int messageLen = (int)(handleLen+inputLen);
     					char* message = (char*)malloc(messageLen);
     					strcpy(message,handle);
     					strcat(message,input);
-    					if((sendStatus=send(connectionSocket,message,messageLen,0))<=-1) {
-    						perror("send");
-    					}
-    					else{
+    					int finalLen = strlen(message);
+                        if (sendAll(connectionSocket, message, &finalLen) == -1) {
+                            perror("sendall");
+                            printf("We only sent %d bytes because of the error!\n", finalLen);
+                        } 
+                        else{
     						//printf("sending message:%s",message);
-                            fflush(stdout);
+                            //fflush(stdout);
     					}
-                        //printf("send success on this side!123");
-                        fflush(stdout);
+                        free(message);
+
     				}
     				close(connectionSocket);
                 exit(0);
@@ -186,3 +204,27 @@ int main(int argc, char* argv[]){
         }
     return 0;
 }
+
+void signalHandler(int s){
+  while(waitpid(-1, NULL, WNOHANG) > 0);
+}
+
+int sendAll(int s, char *buf, int *len)
+{
+    printf("am I here in this function?");
+    fflush(stdout);
+    int total = 0;        // how many bytes we've sent
+    int bytesleft = *len; // how many we have left to send
+    int n;
+
+    while(total < *len) {
+        n = send(s, buf+total, bytesleft, 0);
+        if (n == -1) { break; }
+        total += n;
+        bytesleft -= n;
+    }
+
+    *len = total; // return number actually sent here
+
+    return n==-1?-1:0; // return -1 on failure, 0 on success
+} 
