@@ -209,10 +209,7 @@ void signalHandler(int s){
   while(waitpid(-1, NULL, WNOHANG) > 0);
 }
 
-int sendAll(int s, char *buf, int *len)
-{
-    printf("am I here in this function?");
-    fflush(stdout);
+int sendAll(int s, char *buf, int *len){
     int total = 0;        // how many bytes we've sent
     int bytesleft = *len; // how many we have left to send
     int n;
@@ -223,8 +220,6 @@ int sendAll(int s, char *buf, int *len)
         total += n;
         bytesleft -= n;
     }
-
     *len = total; // return number actually sent here
-
     return n==-1?-1:0; // return -1 on failure, 0 on success
-} 
+}
