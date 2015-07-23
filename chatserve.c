@@ -184,7 +184,6 @@ int main(int argc, char* argv[]){
 
                     response[charsRecv-1]= '\0';
                     
-                    printf("about to strncmp");
                     if(!strncmp(response,"SIGINT",6)){
                         waitForConnection=0;
                         printf("SIGINT received. Connection closed by client. Exiting program.");
