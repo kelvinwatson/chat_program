@@ -31,7 +31,7 @@ class TCPClient {
 			outToServer = new DataOutputStream(clientSocket.getOutputStream());   
 			inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   
 						
-			System.out.println("\n\nSimple Chat System (CLIENT)");
+			System.out.println("\n\nSimple Chat System (CHATCLIENT)");
 			System.out.println("Programmed by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
 			System.out.println("**************************************************************");
 			System.out.println("TCP Connection established. Welcome to Simple Chat.");
@@ -57,6 +57,7 @@ class TCPClient {
 					System.out.println(response);   
 				}
 				else{
+					outToServer.writeBytes("SIGQUIT");
 					System.out.print("\nChat terminated. ");
 					break;
 				}
