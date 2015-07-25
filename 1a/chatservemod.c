@@ -33,12 +33,21 @@ void signalHandler(int);
 int sendAll(int,char*,int*);
 char* receiveMessage(char*,int,size_t);
 void sendMessage(char*,char*,int,size_t);
-char* startUp(int,char**);
 
 int main(int argc, char* argv[]){
-    
-    char *portNumber = startUp(argc,argv);
+    char *portNumber;
+    if(argc<2){
+        fprintf(stderr,"\n***ERROR: Missing port number in command-line argument: e.g. ./TCPserver port\n\n");
+        exit(0);
+    }
+    else portNumber = argv[1];
 
+    printf("\n\nSimple Chat System (SERVER SIDE)");
+    printf("\nProgrammed by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
+    printf("\n**************************************************************");
+        
+    printf("\nWelcome to the chatserve program. You are the server!\n");
+    fflush(stdout);
     char handle[] = "server> ";
     size_t handleLen = strlen(handle);
     printf("\nYour handle is %s",handle);
@@ -80,11 +89,13 @@ int main(int argc, char* argv[]){
     freeaddrinfo(serverInfo);
 
     int waitForConnection=0;
-    while(1){
+    while(1){     
+        
         if (listen(welcomeSocket, BACKLOG) == -1) {
             perror("listen");
             exit(1);
         }
+        
         sa.sa_handler = signalHandler; // reap all dead processes
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = SA_RESTART;
@@ -92,6 +103,7 @@ int main(int argc, char* argv[]){
             perror("sigaction");
             exit(1);
         }
+
 
         printf("\nServer: Waiting for client connections on port %s...\n",portNumber);
         fflush(stdout);
@@ -210,13 +222,11 @@ int sendAll(int s, char *buf, int *len){
 }
 
 /* Function: receiveMessage
- * Description: receives messages from client and prevents blocking by
- * implementing a time delay, so the function loops until all parts of
- * the response is received 
- * Source: http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
- * Parameters: string to store response, connectionSocket, and start time
- * Preconditions: TCP connection must be established between client and server
- * Postconditions: returns the response string to main
+ * Description: receives messages from client 
+ * Source: http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#sendall
+ * Parameters: string to send, buffer and string length
+ * Preconditions: buffer must be allocated
+ * Postconditions: returns -1 on failure, and 0 on success
  */
 char* receiveMessage(char* resp,int cSocket,size_t startTime){
     int transferStarted = 0, charsRecv;
@@ -245,13 +255,6 @@ char* receiveMessage(char* resp,int cSocket,size_t startTime){
     return resp;
 }
 
-/* Function: sendMessage
- * Description: callse sendAll to complete the message transfer
- * Source: http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
- * Parameters: message to be sent, handle, connectionSocket, length of handle
- * Preconditions: TCP connection must be established between client and server
- * Postconditions: frees the dynamically allocated handle+message
- */
 void sendMessage(char* input,char* handle,int cSocket,size_t hLen){ 
     int inputLen = (int)strlen(input);
     int messageLen = (int)(hLen+inputLen);
@@ -264,25 +267,4 @@ void sendMessage(char* input,char* handle,int cSocket,size_t hLen){
         printf("We only sent %d bytes because of the error!\n", finalLen);
     } 
     free(message);
-}
-
-/* Function: startUp
- * Description: accepts the port number from the commandline
- * Parameters: command line argument count and argument values
- * Preconditions: program must be executed with commandline arguments
- * Postconditions: returns the port number
- */
-char* startUp(int argC, char** argV){
-    if(argC<2){
-        fprintf(stderr,"\n***ERROR: Missing port number in command-line argument: e.g. ./TCPserver port\n\n");
-        exit(0);
-    }
-    else{ 
-    printf("\n\nSimple Chat System (SERVER SIDE)");
-    printf("\nProgrammed by Kelvin Watson, OSU ID 932540242, onid: watsokel)");
-    printf("\n**************************************************************");   
-    printf("\nWelcome to the chatserve program. You are the server!\n");
-    fflush(stdout);
-    return argV[1];
-    }
 }
