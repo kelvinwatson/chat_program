@@ -10,8 +10,9 @@ CODE SOURCES:
 
 *** Before proceeding, please ensure that you have the 3 required files:
 	chatserve.c
-	chatclient.java 
 	makefile
+	chatclient.java 
+	TCPClient.java
 
 *** INSTRUCTIONS FOR COMPILING, EXECUTING AND CONTROLLING CHATSERVE AND CHATCLIENT***
 
@@ -20,7 +21,7 @@ CODE SOURCES:
 2. Compile the chatserve program on FLIP by typing: 	make
 (alternatively, you could also type "make all" without the quotes)
 
-3. Compile the chatclient program on FLIP by typing: 	javac chatclient.java
+3. Compile the chatclient program on FLIP by typing: 	javac chatclient.java TCPClient.java
 
 4. Determine the server's IP address by typing "ifconfig" (without the quotes). The "inet addr" is the number you will need to execute the chatclient program. 
 	- As an example for the following steps, we will assume the server's IP address is 128.193.54.226, and assume 	the server will use port number 30020, but you will enter the correct IP address for your machine, and  and the port number of your choosing.
