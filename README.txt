@@ -1,13 +1,4 @@
-CS 372: Project #1 (Programming Assignment #1)
-Programmed by KELVIN WATSON; OSU ID 932540242; ONID: watsokel
-
-CODE SOURCES:
-1. http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
-2. https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
-3. http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
-4. docs.oracle.com/javase/tutorial/networking/sockets/index.html
-5. http://cboard.cprogramming.com/c-programming/98138-fflush-stdout.html
-
+Chat Program (C server, Java client)
 *** Before proceeding, please ensure that you have the 3 required files:
 	chatserve.c
 	makefile
@@ -48,3 +39,11 @@ The chatserve program will then go back to waiting for a new connection from ano
 The chatserve program will then go back to waiting for a new connection from another client. To establish a new connection with the chatserve program, repeat starting from step 6.
 
 13. If the chatclient would like to tell chatserve to interrupt (terminate its TCP connection and exit the program), then in the chatclient, type: SIGINT and press <Enter> to send the signal to chatserve. The chatserve program will then exit.
+
+CODE SOURCES:
+1. http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
+2. https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
+3. http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
+4. docs.oracle.com/javase/tutorial/networking/sockets/index.html
+5. http://cboard.cprogramming.com/c-programming/98138-fflush-stdout.html
+
