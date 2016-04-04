@@ -10,7 +10,7 @@ Chat Program (C server, Java client)
 1. If running both programs on one computer, open two FLIP windows in PuTTY and navigate to the directory where the chatserver.c and chatclient.java are stored.
 
 2. Compile the chatserve program on FLIP by typing: 	make
-(alternatively, you could also type "make all" without the quotes)
+(alternatively, you could also type ```make all``` without the quotes)
 
 3. Compile the chatclient program on FLIP by typing: 	javac chatclient.java TCPClient.java
 
