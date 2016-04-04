@@ -43,5 +43,5 @@ The chatserve program will then go back to waiting for a new connection from ano
 1. http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
 2. https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
 3. http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
-4. docs.oracle.com/javase/tutorial/networking/sockets/index.html
+4. http://docs.oracle.com/javase/tutorial/networking/sockets/index.html
 5. http://cboard.cprogramming.com/c-programming/98138-fflush-stdout.html
