@@ -1,11 +1,11 @@
-Chat Program (C server, Java client)
-*** Before proceeding, please ensure that you have the 3 required files:
+#Chat Program (C server, Java client)
+####Before proceeding, please ensure that you have the 3 required files:
 	chatserve.c
 	makefile
 	chatclient.java 
 	TCPClient.java
 
-*** INSTRUCTIONS FOR COMPILING, EXECUTING AND CONTROLLING CHATSERVE AND CHATCLIENT***
+####INSTRUCTIONS FOR COMPILING, EXECUTING AND CONTROLLING CHATSERVE AND CHATCLIENT
 
 1. If running both programs on one computer, open two FLIP windows in PuTTY and navigate to the directory where the chatserver.c and chatclient.java are stored.
 
@@ -18,10 +18,10 @@ Chat Program (C server, Java client)
 4. Determine the server's IP address by typing `ifconfig`. The "inet addr" is the number you will need to execute the chatclient program. 
 - As an example for the following steps, we will assume the server's IP address is 128.193.54.226, and assume the server will use port number 30020, but you will enter the correct IP address for your machine, and  and the port number of your choosing.
 
-5. Execute the chatserve program by typing:	`./chatserve 30020`. The format is `./chatserve <port_number>`
+5. Execute the chatserve program by typing: `./chatserve 30020`. The format is `./chatserve <port_number>`
 The chatserve program is now waiting for a client connection.
 
-6. Execute the chatclient program by typing:	`java chatclient 128.193.54.226 30020`. The format is `java chatclient <IP_address> <port_number>`.
+6. Execute the chatclient program by typing: `java chatclient 128.193.54.226 30020`. The format is `java chatclient <IP_address> <port_number>`.
 
 7. In the chatclient program, type your desired username up to 10 characters, and press <Enter>. This will be your handle for the chat conversation with the server.
 
@@ -39,7 +39,7 @@ The chatserve program will then go back to waiting for a new connection from ano
 
 13. If the chatclient would like to tell chatserve to interrupt (terminate its TCP connection and exit the program), then in the chatclient, type: SIGINT and press <Enter> to send the signal to chatserve. The chatserve program will then exit.
 
-CODE SOURCES:
+####CODE SOURCES
 1. http://www.cs.rpi.edu/~moorthy/Courses/os98/Pgms/socket.html
 2. https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
 3. http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html
